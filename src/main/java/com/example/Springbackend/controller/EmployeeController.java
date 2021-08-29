@@ -8,8 +8,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+@CrossOrigin(origins = "http://localHost:3000")
 @RestController
 @RequestMapping("/api/v1.0")
 public class EmployeeController {
@@ -42,14 +45,16 @@ public class EmployeeController {
         employee.setFirstName(employeeDetails.getFirstName());
         employee.setLastName(employeeDetails.getLastName());
         employee.setEmailId(employeeDetails.getEmailId());
-        employeeRepository.save(employee);
-        return ResponseEntity.ok().body(employee);
+        Employee updatedEmployee = employeeRepository.save(employee);
+        return ResponseEntity.ok(updatedEmployee);
     }
 
     @DeleteMapping("/employees/{id}")
-    public ResponseEntity<Object> deleteEmployee(@PathVariable(value = "id")long employeeId)throws ResourceNotFoundException {
+    public ResponseEntity<Map<String,Boolean>> deleteEmployee(@PathVariable(value = "id")long employeeId)throws ResourceNotFoundException {
         Employee employee  = employeeRepository.findById(employeeId).orElseThrow(()->new ResourceNotFoundException("Employee not found "+employeeId));
         employeeRepository.delete(employee);
-        return ResponseEntity.ok().build();
+        Map<String,Boolean> res = new HashMap<String,Boolean>();
+        res.put("Deleted",Boolean.TRUE);
+        return ResponseEntity.ok(res);
     }
 }
